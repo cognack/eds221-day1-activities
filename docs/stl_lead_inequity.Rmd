@@ -1,0 +1,75 @@
+---
+title: "stl_lead_steven"
+author: "Steven Cognac"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(skimr)
+
+```
+
+## Read .csv file stl_blood_lead.csv
+
+```{r}
+stl_blood <- read_delim(here::here("data", "data-raw", "stl_blood_lead.csv"), delim = ";") %>% 
+  clean_names() %>% 
+  mutate() %>% 
+  mutate(pct_elevated = str_replace(pct_elevated,
+                                   patter = ",",
+                                   replacement = ".")) %>% 
+  mutate(pct_elevated = as.numeric(pct_elevated))
+
+```
+## View the details of the project in skimr
+```{r}
+skimr::skim(stl_blood)
+
+```
+
+## Create scatterplot and graph percentage of childeren in each census tract with elevated blood lead levels vs the percent of each census tract identifying as white
+```{r}
+
+stl_lead_plot <- ggplot(data = stl_blood, (aes(x = white, y = pct_elevated))) +
+  geom_point(aes(color = pct_elevated, alpha = 0.4)) +
+  theme_minimal() +
+  labs(x = "Total White Population",
+       y = "% Elevated",
+       title = "High Blood Lead Levels in White Population\n in St. Louis, Missouri")
+  
+
+
+stl_lead_plot
+
+```
+## save the plot as a .png
+```{r}
+ggsave(here::here("figs", "stl_lead_plot.png"), width = 6, height = 5)
+
+```
+
+#### The graph represents the percent of elevated lead levels compared to the total white population in St. Louis, Missouri. The general trend shows  
+
+
+## Create histogram of pct_elevated
+```{r}
+stl_histo_plot <- ggplot(data = stl_blood, aes(x = pct_elevated)) +
+  geom_histogram(fill="lightblue",color="red", linetype="dashed", alpha = 0.5) +
+  labs(x = "% Elevated",
+       title = "Histogram of % Elevated")
+
+stl_histo_plot
+
+```
+## Export to figs folder
+```{r}
+ggsave(here::here("figs", "stl_histo_plot.jpg"), width = 6, height = 5)
+
+```
+
